@@ -20,7 +20,7 @@ def find(quantum_circuit):
             Console().clear()
             print(ascii_art)
         
-            print("1. Bloch Sphere Visualization\n2. Histogram\n3. Operator\n4. Circuit Visualization\n5. Measurement Circuit\n6. Goto Gate Selection")
+            print("Choose:\n1. Bloch Sphere Visualization\n2. Histogram\n3. Operator\n4. Circuit Visualization\n5. Measurement Circuit\n6. Goto Gate Selection")
         
             user_find = int(input("Enter your choice: "))
             
