@@ -1,17 +1,17 @@
 # Quantum-Gates
 
-### Language: Python
+### 👉 Language: Python
 
 ---
 
-### Library Used: qiskit
+### 👉 Library Used: qiskit
 
 ---
 
-### Visit:
+### 👉 Visit:
 
-👉 `LinkedIn` - [Visit](https://linkedin.com/in/anshmnsoni)
+`LinkedIn` - [Visit](https://linkedin.com/in/anshmnsoni)
 
 ---
 
-### Thank You
+### 👉 Thank You
