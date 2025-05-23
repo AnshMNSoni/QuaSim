@@ -17,15 +17,15 @@ Welcome to **QuaSim** – a powerful, easy-to-use **Quantum Circuit Simulator** 
 
 ## 📸 Demo
 
-![QuaSim Demo](demo.gif)
+### Preview
 
-> *Note: Include a screen recording or GIF of your tool in action for better visibility.*
+![image](https://github.com/user-attachments/assets/905c910a-9d2b-47be-afbf-00532d127672)
 
 ---
 
 ## 🌐 Try It Live
 
-👉 [Click here to use QuaSim](https://v0-python-circuit-simulator.vercel.app/)
+#### 👉 [Click here to use QuaSim](https://v0-python-circuit-simulator.vercel.app/)
 
 ---
 
@@ -43,10 +43,19 @@ To get the most out of QuaSim, users should be familiar with:
 
 You can run QuaSim locally by following these steps:
 
-```bash
+```sh
 git clone https://github.com/yourusername/QuaSim.git
+```
+
+```sh
 cd QuaSim
+```
+
+```sh
 npm install      # or pip install -r requirements.txt if it's Python-based
+```
+
+```sh
 npm start        # or python app.py for Flask apps
 ```
 
@@ -56,3 +65,10 @@ npm start        # or python app.py for Flask apps
 - Configure the circuit using the panel.
 - Click "Run Simulation" to view the result.
 - Analyze outputs and adjust as needed.
+
+## 🙌 Acknowledgements
+- Inspired by the growing needs of the **National Quantum Mission (NQM)**
+- Thanks to the quantum community for continued motivation and support.
+
+## 📬 Contact
+Created with ❤️ by `Ansh Soni`
