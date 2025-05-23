@@ -70,5 +70,9 @@ npm start        # or python app.py for Flask apps
 - Inspired by the growing needs of the **National Quantum Mission (NQM)**
 - Thanks to the quantum community for continued motivation and support.
 
-## 📬 Contact
-Created with ❤️ by `Ansh Soni`
+### 🔗 Connect with Me:
+`GitHub` - [Visit](https://github.com/AnshMNSoni) </br>
+`LinkedIn` - [Visit](https://linkedin.com/in/anshsoni) </br>
+`Follow Us` - [Visit](https://linkedin.com/company/py-shell)
+
+### Thank you 💫
