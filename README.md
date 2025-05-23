@@ -25,7 +25,7 @@ Welcome to **QuaSim** – a powerful, easy-to-use **Quantum Circuit Simulator** 
 
 ## 🌐 Try It Live
 
-👉 [Click here to use QuaSim](https://lnkd.in/dCGykfvD)
+👉 [Click here to use QuaSim](https://v0-python-circuit-simulator.vercel.app/)
 
 ---
 
@@ -48,3 +48,11 @@ git clone https://github.com/yourusername/QuaSim.git
 cd QuaSim
 npm install      # or pip install -r requirements.txt if it's Python-based
 npm start        # or python app.py for Flask apps
+```
+
+## 🛠️ Usage
+- Open the simulator.
+- Drag gates onto the qubit lines.
+- Configure the circuit using the panel.
+- Click "Run Simulation" to view the result.
+- Analyze outputs and adjust as needed.
