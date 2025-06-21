@@ -71,8 +71,6 @@ npm start        # or python app.py for Flask apps
 - Thanks to the quantum community for continued motivation and support.
 
 ## 🔗 Connect with Me:
-#### `GitHub` - [Visit](https://github.com/AnshMNSoni) </br>
-#### `LinkedIn` - [Visit](https://linkedin.com/in/anshsoni) </br>
-#### `Follow Us` - [Visit](https://linkedin.com/company/py-shell)
+#### `GitHub` - [Visit](https://github.com/AnshMNSoni) | `LinkedIn` - [Visit](https://linkedin.com/in/anshsoni) | `Follow Us` - [Visit](https://linkedin.com/company/py-shell)
 
 ### Thank you ✨
