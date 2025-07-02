@@ -73,4 +73,4 @@ npm start        # or python app.py for Flask apps
 ## 🔗 Connect with Me:
 #### `GitHub` - [Visit](https://github.com/AnshMNSoni) | `LinkedIn` - [Visit](https://linkedin.com/in/anshsoni) | `Follow Us` - [Visit](https://linkedin.com/company/py-shell)
 
-### Thank you ✨
+### Thank you
