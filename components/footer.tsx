@@ -60,7 +60,7 @@ export function Footer() {
               <span className="text-sm text-gray-600 dark:text-gray-400">Developed with</span>
               <Heart className="h-4 w-4 text-red-500 animate-pulse" />
               <span className="text-sm text-gray-600 dark:text-gray-400">by</span>
-              <span className="font-medium text-gray-800 dark:text-gray-200">Ansh Soni</span>
+              <span className="font-medium text-emerald-600 dark:text-emerald-400">Ansh Soni</span>
             </div>
             <div className="flex space-x-2 mt-2">
               <a

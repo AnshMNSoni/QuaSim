@@ -16,6 +16,7 @@ import { HTML5Backend } from "react-dnd-html5-backend"
 import { ThemeToggle } from "./theme-toggle"
 import { GitHubLink } from "./github-link"
 import { Footer } from "./footer"
+import { Support } from "./support"
 
 export default function QuantumSimulator() {
   const [circuit, setCircuit] = useState<QuantumCircuit>(new QuantumCircuit(2))
@@ -144,11 +145,11 @@ export default function QuantumSimulator() {
                 <h1 className="text-2xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
                   QuaSim
                 </h1>
-                <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">Quantum Circuit Simulator</p>
               </div>
               <div className="flex items-center gap-2">
                 <GitHubLink />
                 <ThemeToggle />
+                <Support />
               </div>
             </div>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 text-center">
