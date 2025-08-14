@@ -10,7 +10,9 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "QuaSim - Quantum Circuit Simulator",
   description: "A web-based quantum circuit simulator for building and visualizing quantum circuits",
-    generator: 'v0.dev'
+  icons: {
+    icon: "/favicon.png",
+  },
 }
 
 export default function RootLayout({
