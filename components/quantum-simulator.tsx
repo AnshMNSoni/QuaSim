@@ -1,10 +1,10 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import CircuitBuilder from "./circuit-builder"
 import VisualizationPanel from "./visualization-panel"
+import TruthTable from "./truth-table"
 import GateSelector from "./gate-selector"
 import ControlPanel from "./control-panel"
 import { QuantumCircuit } from "@/lib/quantum-circuit"
@@ -49,14 +49,10 @@ export default function QuantumSimulator() {
   const handleAddGate = (gate: string, qubit: number, control?: number, step?: number) => {
     const newCircuit = circuit.clone()
 
-    // For mobile selection, we might not have a valid qubit yet
     if (qubit < 0 || qubit >= circuit.numQubits) {
-      // This is likely a mobile gate selection, store it for later placement
-      // We'll handle this in the CircuitBuilder component
       return
     }
 
-    // Add the gate to the circuit at the specific step if provided
     if (step !== undefined) {
       newCircuit.addGateAtStep(gate, qubit, step, control)
     } else {
@@ -64,14 +60,14 @@ export default function QuantumSimulator() {
     }
 
     setCircuit(newCircuit)
-    setSimulationResult(null) // Clear previous simulation results
+    setSimulationResult(null)
   }
 
   const handleRemoveGate = (step: number, qubit: number) => {
     const newCircuit = circuit.clone()
     newCircuit.removeGate(step, qubit)
     setCircuit(newCircuit)
-    setSimulationResult(null) // Clear previous simulation results
+    setSimulationResult(null)
   }
 
   const handleClearCircuit = () => {
@@ -194,7 +190,6 @@ export default function QuantumSimulator() {
                             ? "bg-purple-600 text-white"
                             : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600"
                         }`}
-                        title="View the quantum circuit diagram"
                       >
                         Circuit
                       </button>
@@ -205,7 +200,6 @@ export default function QuantumSimulator() {
                             ? "bg-purple-600 text-white"
                             : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600"
                         }`}
-                        title="View qubit states on Bloch spheres"
                       >
                         Bloch Sphere
                       </button>
@@ -216,7 +210,6 @@ export default function QuantumSimulator() {
                             ? "bg-purple-600 text-white"
                             : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600"
                         }`}
-                        title="View measurement probability distribution"
                       >
                         Histogram
                       </button>
@@ -227,9 +220,18 @@ export default function QuantumSimulator() {
                             ? "bg-purple-600 text-white"
                             : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600"
                         }`}
-                        title="View quantum state vector amplitudes"
                       >
                         State Vector
+                      </button>
+                      <button
+                        onClick={() => setActiveVisualization("truthTable")}
+                        className={`px-2 sm:px-3 py-1 sm:py-2 rounded-md text-xs sm:text-sm font-medium transition-colors flex items-center justify-center ${
+                          activeVisualization === "truthTable"
+                            ? "bg-purple-600 text-white"
+                            : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600"
+                        }`}
+                      >
+                        Truth Table
                       </button>
                     </div>
                   </div>
@@ -242,12 +244,19 @@ export default function QuantumSimulator() {
                         "Probability distribution of possible measurement outcomes"}
                       {activeVisualization === "statevector" &&
                         "Amplitude and phase of each basis state in the quantum state vector"}
+                      {activeVisualization === "truthTable" &&
+                        "Truth table of quantum states with probabilities, amplitudes, and phases"}
                     </div>
-                    <VisualizationPanel
-                      result={simulationResult}
-                      circuit={circuit}
-                      activeVisualization={activeVisualization}
-                    />
+
+                    {activeVisualization === "truthTable" ? (
+                      <TruthTable result={simulationResult} circuit={circuit} />
+                    ) : (
+                      <VisualizationPanel
+                        result={simulationResult}
+                        circuit={circuit}
+                        activeVisualization={activeVisualization}
+                      />
+                    )}
                   </div>
                 </div>
               )}

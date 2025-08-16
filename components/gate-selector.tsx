@@ -52,7 +52,7 @@ const DraggableGate = ({ gate, label, description, onSelectGate }: DraggableGate
     <div
       ref={drag}
       onClick={handleClick}
-      className={`p-2 sm:p-3 rounded-md mb-2 cursor-grab ${getGateColor(gate)} ${isDragging ? "opacity-50" : ""}`}
+      className={`p-2 sm:p-3 rounded-md mb-2 cursor-grab flex-shrink-0 ${getGateColor(gate)} ${isDragging ? "opacity-50" : ""}`}
     >
       <div className="flex items-center">
         <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-md flex items-center justify-center text-white font-bold border border-white text-xs sm:text-sm">
@@ -82,23 +82,46 @@ export default function GateSelector({ onSelectGate, circuit }: GateSelectorProp
   ]
 
   return (
-    <div>
-      <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-4">Quantum Gates</h2>
-      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mb-3 sm:mb-4">
-        <span className="hidden md:inline">Drag and drop gates onto the circuit</span>
-        <span className="md:hidden">Tap a gate to select, then tap on the circuit to place</span>
-      </p>
+    <div className="flex flex-col h-full">
+      <div className="flex-shrink-0">
+        <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-4">Quantum Gates</h2>
+        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mb-3 sm:mb-4">
+          <span className="hidden md:inline">Drag and drop gates onto the circuit</span>
+          <span className="md:hidden">Tap a gate to select, then tap on the circuit to place</span>
+        </p>
+      </div>
 
-      <div className="space-y-1 sm:space-y-2">
-        {gates.map((gate) => (
-          <DraggableGate
-            key={gate.gate}
-            gate={gate.gate}
-            label={gate.label}
-            description={gate.description}
-            onSelectGate={onSelectGate}
-          />
-        ))}
+      <div className="flex-1 min-h-0">
+        {/* Desktop: Vertical scrolling */}
+        <div className="hidden md:block h-full">
+          <div className="h-96 overflow-y-auto pr-2 space-y-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
+            {gates.map((gate) => (
+              <DraggableGate
+                key={gate.gate}
+                gate={gate.gate}
+                label={gate.label}
+                description={gate.description}
+                onSelectGate={onSelectGate}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Mobile: Horizontal scrolling */}
+        <div className="md:hidden">
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
+            {gates.map((gate) => (
+              <div key={gate.gate} className="flex-shrink-0 w-32">
+                <DraggableGate
+                  gate={gate.gate}
+                  label={gate.label}
+                  description={gate.description}
+                  onSelectGate={onSelectGate}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   )
