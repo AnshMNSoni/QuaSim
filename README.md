@@ -15,9 +15,7 @@ Welcome to **QuaSim** – a powerful, easy-to-use **Quantum Circuit Simulator** 
 
 ---
 
-## 📸 Demo
-
-### Preview
+## 📸 Preview
 
 ![image](https://github.com/user-attachments/assets/905c910a-9d2b-47be-afbf-00532d127672)
 
