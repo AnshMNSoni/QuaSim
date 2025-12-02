@@ -29,7 +29,7 @@ Welcome to **QuaSim** – a powerful, easy-to-use **Quantum Circuit Simulator** 
 
 ## 🌐 Try It Live
 
-#### 👉 [Click here to use QuaSim](https://v0-python-circuit-simulator.vercel.app/)
+#### 👉 [Click here to use QuaSim](https://quasimdottech.netlify.app/)
 
 ---
 
