@@ -89,9 +89,6 @@ export function Footer() {
           <p className="text-xs text-gray-500 dark:text-gray-500">
             © {new Date().getFullYear()} QuaSim - Quantum Circuit Simulator. All rights reserved.
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-500 mt-2 md:mt-0">
-            Built with Next.js, React, and TypeScript
-          </p>
         </div>
       </div>
     </footer>
