@@ -22,6 +22,9 @@ Welcome to **QuaSim** – a powerful, easy-to-use **Quantum Circuit Simulator** 
 ## 🔎 AI Assistant Mode
 <img width="1898" height="922" alt="image" src="https://github.com/user-attachments/assets/fb4bfb42-1342-4db4-8842-dcb465640320" />
 
+## 👤 User Centered Design
+<img width="1899" height="921" alt="image" src="https://github.com/user-attachments/assets/f8ac69f6-3841-4cfd-aee5-86d85e54dc17" />
+
 ---
 
 ## 🌐 Try It Live
