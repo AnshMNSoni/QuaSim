@@ -36,33 +36,37 @@ export function AIAssistant({
   const [isLoading, setIsLoading] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
 
+  // Highlight effect with auto scroll to highlighted element
   useEffect(() => {
-    if (messages.length > 0) {
-      const lastMessage = messages[messages.length - 1]
-      if (lastMessage.role === "assistant" && lastMessage.highlightedElement) {
-        onHighlightElement(lastMessage.highlightedElement)
+    const lastMessage = messages[messages.length - 1]
+    if (lastMessage?.role === "assistant" && lastMessage.highlightedElement) {
+      const element = document.getElementById(lastMessage.highlightedElement)
 
-        // Auto-remove highlight after 5 seconds
-        const timer = setTimeout(() => onHighlightElement(null), 5000)
-        return () => clearTimeout(timer)
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" })
       }
+
+      onHighlightElement(lastMessage.highlightedElement)
+
+      const timer = setTimeout(() => onHighlightElement(null), 5000)
+      return () => clearTimeout(timer)
     }
   }, [messages, onHighlightElement])
 
-  // Show initial greeting
+  // Initial greeting
   useEffect(() => {
     if (isOpen && messages.length === 0) {
       const greeting: Message = {
         id: "greeting",
         role: "assistant",
-        content: `👋 Hi! I'm your Quantum Circuit Assistant. I can help you understand quantum computing, guide you through using QuaSim, or answer any questions about quantum gates and simulations. What would you like to know?`,
+        content: `👋 Hi! I'm your Quantum Circuit Assistant. I can help you understand quantum computing, guide you through QuaSim, or answer anything about quantum gates. What would you like to know?`,
         timestamp: new Date(),
       }
       setMessages([greeting])
     }
   }, [isOpen, messages.length])
 
-  // Auto-scroll to latest message
+  // Auto scroll chat
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: "smooth" })
@@ -110,23 +114,27 @@ export function AIAssistant({
         }
         setMessages((prev) => [...prev, assistantMessage])
       } else {
-        const errorMessage: Message = {
-          id: `error-${Date.now()}`,
-          role: "assistant",
-          content: "Sorry, I encountered an error. Please try again.",
-          timestamp: new Date(),
-        }
-        setMessages((prev) => [...prev, errorMessage])
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `error-${Date.now()}`,
+            role: "assistant",
+            content: "Sorry, something went wrong. Try again.",
+            timestamp: new Date(),
+          },
+        ])
       }
     } catch (error) {
-      console.error("[v0] Error:", error)
-      const errorMessage: Message = {
-        id: `error-${Date.now()}`,
-        role: "assistant",
-        content: "Sorry, I couldn't connect to the assistant. Please try again.",
-        timestamp: new Date(),
-      }
-      setMessages((prev) => [...prev, errorMessage])
+      console.error("[AI Assist Error]:", error)
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `error-${Date.now()}`,
+          role: "assistant",
+          content: "Connection issue — please try again.",
+          timestamp: new Date(),
+        },
+      ])
     } finally {
       setIsLoading(false)
     }
@@ -145,9 +153,15 @@ export function AIAssistant({
   }
 
   return (
-    <Card className="fixed bottom-4 right-4 z-50 w-96 max-w-[calc(100vw-2rem)] flex flex-col h-[600px] shadow-2xl">
+    <Card
+      className="
+        fixed bottom-0 right-0 left-0 z-50 
+        w-full h-[85vh] rounded-t-2xl flex flex-col shadow-2xl
+        md:bottom-4 md:right-4 md:left-auto md:w-96 md:h-[600px] md:rounded-xl
+      "
+    >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-t-lg">
+      <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-t-2xl md:rounded-t-lg">
         <div className="flex items-center gap-2">
           <MessageCircle className="w-5 h-5" />
           <h3 className="font-semibold">QuaSim Assistant</h3>
@@ -165,13 +179,13 @@ export function AIAssistant({
         </button>
       </div>
 
-      {/* Messages Area */}
-      <ScrollArea className="flex-1 p-4 bg-gray-50 dark:bg-gray-900">
+      {/* Messages */}
+      <ScrollArea className="flex-1 p-3 md:p-4 bg-gray-50 dark:bg-gray-900 overflow-y-auto">
         <div className="space-y-3">
           {messages.map((message) => (
             <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
               <div
-                className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
+                className={`max-w-[80%] md:max-w-xs px-3 py-2 rounded-lg text-sm ${
                   message.role === "user"
                     ? "bg-purple-500 text-white rounded-br-none"
                     : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-bl-none"
@@ -192,8 +206,8 @@ export function AIAssistant({
         </div>
       </ScrollArea>
 
-      {/* Input Area */}
-      <form onSubmit={handleSendMessage} className="border-t p-3 bg-white dark:bg-gray-800 rounded-b-lg">
+      {/* Input */}
+      <form onSubmit={handleSendMessage} className="border-t p-3 bg-white dark:bg-gray-800 rounded-b-xl">
         <div className="flex gap-2">
           <Input
             value={input}
@@ -202,12 +216,7 @@ export function AIAssistant({
             disabled={isLoading}
             className="text-sm"
           />
-          <Button
-            type="submit"
-            disabled={isLoading || !input.trim()}
-            size="sm"
-            className="bg-purple-500 hover:bg-purple-600"
-          >
+          <Button type="submit" disabled={isLoading || !input.trim()} size="sm" className="bg-purple-500 hover:bg-purple-600">
             <Send className="w-4 h-4" />
           </Button>
         </div>
