@@ -1,4 +1,4 @@
-# ⚛️ QuaSim – Quantum Circuit Simulator
+# ⚛️ QuaSim – Quantum Circuit Simulator (Made in India)
 
 Welcome to **QuaSim** – a powerful, easy-to-use **Quantum Circuit Simulator** designed for both learners and developers in the quantum computing space. This tool lets you **build, simulate, and analyze** quantum circuits with an intuitive drag-and-drop interface.
 
@@ -19,11 +19,17 @@ Welcome to **QuaSim** – a powerful, easy-to-use **Quantum Circuit Simulator** 
 
 ![image](https://github.com/user-attachments/assets/905c910a-9d2b-47be-afbf-00532d127672)
 
+## 🔎 AI Assistant Mode
+<img width="1898" height="922" alt="image" src="https://github.com/user-attachments/assets/fb4bfb42-1342-4db4-8842-dcb465640320" />
+
+## 👤 User Centered Design
+<img width="1899" height="921" alt="image" src="https://github.com/user-attachments/assets/f8ac69f6-3841-4cfd-aee5-86d85e54dc17" />
+
 ---
 
 ## 🌐 Try It Live
 
-#### 👉 [Click here to use QuaSim](https://v0-python-circuit-simulator.vercel.app/)
+#### 👉 [Click here to use QuaSim](https://quasimdottech.netlify.app/)
 
 ---
 
