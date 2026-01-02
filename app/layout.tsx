@@ -1,12 +1,13 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Inter, Caveat } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import LoadingWrapper from "@/components/loading-wrapper"
 
 const inter = Inter({ subsets: ["latin"] })
+const caveat = Caveat({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "QuaSim - Quantum Circuit Simulator",
@@ -22,6 +23,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <style>{`
+            :root {
+              --font-caveat: ${caveat.style.fontFamily};
+            }
+          `}</style>
           <LoadingWrapper>{children}</LoadingWrapper>
           <Toaster />
         </ThemeProvider>
