@@ -11,11 +11,9 @@ interface GateSelectorProps {
 interface DraggableGateProps {
   gate: string
   label: string
-  description: string
-  onSelectGate: (gate: string, qubit: number) => void
 }
 
-const DraggableGate = ({ gate, label, description, onSelectGate }: DraggableGateProps) => {
+const DraggableGate = ({ gate, label }: DraggableGateProps) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "gate",
     item: { gate },
@@ -32,96 +30,111 @@ const DraggableGate = ({ gate, label, description, onSelectGate }: DraggableGate
       Z: "bg-yellow-500",
       S: "bg-purple-500",
       T: "bg-pink-500",
+      I: "bg-slate-500",
+      U: "bg-teal-500",
+      U3: "bg-teal-500",
+      RX: "bg-amber-500",
+      RY: "bg-amber-500",
+      RZ: "bg-amber-500",
+      SX: "bg-fuchsia-500",
+      Phase: "bg-indigo-500",
       CNOT: "bg-indigo-500",
+      CY: "bg-indigo-500",
       CZ: "bg-indigo-500",
+      CRX: "bg-orange-500",
+      CRY: "bg-orange-500",
+      CRZ: "bg-orange-500",
+      CU: "bg-orange-500",
+      CCX: "bg-orange-500",
+      CS: "bg-orange-500",
+      CT: "bg-orange-500",
       SWAP: "bg-orange-500",
+      iSWAP: "bg-orange-500",
+      CSWAP: "bg-orange-500",
+      Fredkin: "bg-orange-500",
+      RXX: "bg-cyan-500",
+      RYY: "bg-cyan-500",
+      RZZ: "bg-cyan-500",
+      XX: "bg-cyan-500",
+      YY: "bg-cyan-500",
+      ZZ: "bg-cyan-500",
       M: "bg-gray-500",
+      Barrier: "bg-gray-500",
+      Reset: "bg-gray-500",
+      Delay: "bg-gray-500",
+      Initialize: "bg-gray-500",
     }
     return colors[gate] || "bg-gray-600"
-  }
-
-  // Add onClick handler for mobile
-  const handleClick = () => {
-    // Only trigger on mobile devices
-    if (window.innerWidth < 768) {
-      onSelectGate(gate, 0) // We'll handle the actual qubit selection in the circuit builder
-    }
   }
 
   return (
     <div
       ref={drag}
-      onClick={handleClick}
-      className={`p-2 sm:p-3 rounded-md mb-2 cursor-grab flex-shrink-0 ${getGateColor(gate)} ${isDragging ? "opacity-50" : ""}`}
+      className={`w-full h-12 rounded-md flex items-center justify-center cursor-grab font-bold text-white text-sm
+        ${getGateColor(gate)}
+        ${isDragging ? "opacity-50" : ""}
+      `}
+      title={gate}
     >
-      <div className="flex items-center">
-        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-md flex items-center justify-center text-white font-bold border border-white text-xs sm:text-sm">
-          {label}
-        </div>
-        <div className="ml-2 sm:ml-3">
-          <h3 className="text-xs sm:text-sm font-semibold text-white">{gate} Gate</h3>
-          <p className="text-[10px] sm:text-xs text-gray-200 hidden sm:block">{description}</p>
-        </div>
-      </div>
+      {label}
     </div>
   )
 }
 
-export default function GateSelector({ onSelectGate, circuit }: GateSelectorProps) {
+export default function GateSelector({ onSelectGate }: GateSelectorProps) {
   const gates = [
-    { gate: "H", label: "H", description: "Hadamard gate" },
-    { gate: "X", label: "X", description: "Pauli-X (NOT) gate" },
-    { gate: "Y", label: "Y", description: "Pauli-Y gate" },
-    { gate: "Z", label: "Z", description: "Pauli-Z gate" },
-    { gate: "S", label: "S", description: "Phase gate (π/2)" },
-    { gate: "T", label: "T", description: "π/8 gate" },
-    { gate: "CNOT", label: "CX", description: "Controlled-NOT gate" },
-    { gate: "CZ", label: "CZ", description: "Controlled-Z gate" },
-    { gate: "SWAP", label: "⇄", description: "SWAP gate" },
-    { gate: "M", label: "M", description: "Measurement" },
+    { gate: "H", label: "H" },
+    { gate: "X", label: "X" },
+    { gate: "Y", label: "Y" },
+    { gate: "Z", label: "Z" },
+    { gate: "S", label: "S" },
+    { gate: "T", label: "T" },
+    { gate: "I", label: "I" },
+    { gate: "U", label: "U" },
+    { gate: "U3", label: "U3" },
+    { gate: "RX", label: "RX" },
+    { gate: "RY", label: "RY" },
+    { gate: "RZ", label: "RZ" },
+    { gate: "SX", label: "√X" },
+    { gate: "Phase", label: "P" },
+    { gate: "CNOT", label: "CX" },
+    { gate: "CY", label: "CY" },
+    { gate: "CZ", label: "CZ" },
+    { gate: "CRX", label: "CRX" },
+    { gate: "CRY", label: "CRY" },
+    { gate: "CRZ", label: "CRZ" },
+    { gate: "CU", label: "CU" },
+    { gate: "CCX", label: "CCX" },
+    { gate: "CS", label: "CS" },
+    { gate: "CT", label: "CT" },
+    { gate: "SWAP", label: "⇄" },
+    { gate: "iSWAP", label: "iSW" },
+    { gate: "CSWAP", label: "CSW" },
+    { gate: "Fredkin", label: "FRD" },
+    { gate: "RXX", label: "RXX" },
+    { gate: "RYY", label: "RYY" },
+    { gate: "RZZ", label: "RZZ" },
+    { gate: "XX", label: "XX" },
+    { gate: "YY", label: "YY" },
+    { gate: "ZZ", label: "ZZ" },
+    { gate: "M", label: "M" },
+    { gate: "Barrier", label: "||" },
+    { gate: "Reset", label: "R" },
+    { gate: "Delay", label: "D" },
+    { gate: "Initialize", label: "In" },
   ]
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-shrink-0">
-        <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-4">Quantum Gates</h2>
-        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mb-3 sm:mb-4">
-          <span className="hidden md:inline">Drag and drop gates onto the circuit</span>
-          <span className="md:hidden">Tap a gate to select, then tap on the circuit to place</span>
-        </p>
-      </div>
+    <div className="hidden md:flex flex-col h-full">
+      <h2 className="text-lg font-semibold mb-2">Select a gate to place</h2>
+      <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+        Drag and drop gates onto the circuit
+      </p>
 
-      <div className="flex-1 min-h-0">
-        {/* Desktop: Vertical scrolling */}
-        <div className="hidden md:block h-full">
-          <div className="h-96 overflow-y-auto pr-2 space-y-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
-            {gates.map((gate) => (
-              <DraggableGate
-                key={gate.gate}
-                gate={gate.gate}
-                label={gate.label}
-                description={gate.description}
-                onSelectGate={onSelectGate}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Mobile: Horizontal scrolling */}
-        <div className="md:hidden">
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
-            {gates.map((gate) => (
-              <div key={gate.gate} className="flex-shrink-0 w-32">
-                <DraggableGate
-                  gate={gate.gate}
-                  label={gate.label}
-                  description={gate.description}
-                  onSelectGate={onSelectGate}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
+      <div className="grid grid-cols-3 gap-2 overflow-y-auto max-h-[500px]">
+        {gates.map((g) => (
+          <DraggableGate key={g.gate} gate={g.gate} label={g.label} />
+        ))}
       </div>
     </div>
   )

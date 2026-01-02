@@ -19,6 +19,9 @@ import { Footer } from "./footer"
 import { Support } from "./support"
 import { AIAssistant } from "./ai-assistant"
 import { HighlightContext } from "@/lib/highlight-context"
+import { Documentation } from "./documentation"
+import { BookOpen } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export default function QuantumSimulator() {
   const [circuit, setCircuit] = useState<QuantumCircuit>(new QuantumCircuit(2))
@@ -27,6 +30,8 @@ export default function QuantumSimulator() {
   const [isSimulating, setIsSimulating] = useState(false)
   const [userAction, setUserAction] = useState<string>("exploring the simulator")
   const [highlightedElement, setHighlightedElement] = useState<string | null>(null)
+  const [selectedMobileGate, setSelectedMobileGate] = useState<string | null>(null)
+  const [isDocumentationOpen, setIsDocumentationOpen] = useState(false)
   const { toast } = useToast()
 
   const handleAddQubit = () => {
@@ -151,32 +156,48 @@ export default function QuantumSimulator() {
             <header className="mb-6">
               <div className="flex justify-between items-center mb-4">
                 <div>
-                  <h1 className="text-2xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
+                  <h1
+                    className="text-2xl sm:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600"
+                    style={{ fontFamily: "var(--font-caveat)" }}
+                  >
                     QuaSim
                   </h1>
                 </div>
                 <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setIsDocumentationOpen(true)}
+                    className="rounded-full"
+                    aria-label="Open documentation"
+                  >
+                    <BookOpen className="h-[1.2rem] w-[1.2rem]" />
+                  </Button>
                   <GitHubLink />
                   <ThemeToggle />
                   <Support />
                 </div>
               </div>
-              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 text-center">
-                Build, visualize, and simulate quantum circuits with an interactive interface
-              </p>
             </header>
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
+              {/* Desktop gate selector */}
               <div
                 id="gate-selector"
-                className={`lg:col-span-1 bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 shadow-lg ${
+                className={`hidden lg:block lg:col-span-1 bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 shadow-lg ${
                   highlightedElement === "gate-selector" ? "highlight-element" : ""
                 }`}
               >
-                <GateSelector onSelectGate={handleAddGate} circuit={circuit} />
+                <GateSelector
+                  onSelectGate={handleAddGate}
+                  circuit={circuit}
+                  selectedMobileGate={selectedMobileGate}
+                  onMobileGateSelect={setSelectedMobileGate}
+                />
               </div>
 
               <div className="lg:col-span-3 space-y-4 sm:space-y-6">
+                {/* Control Panel */}
                 <div
                   id="control-panel"
                   className={`bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 shadow-lg ${
@@ -195,6 +216,7 @@ export default function QuantumSimulator() {
                   />
                 </div>
 
+                {/* Circuit Builder */}
                 <div
                   id="circuit-builder"
                   className={`bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 shadow-lg overflow-hidden ${
@@ -308,6 +330,7 @@ export default function QuantumSimulator() {
             userAction={userAction}
             onHighlightElement={setHighlightedElement}
           />
+          <Documentation isOpen={isDocumentationOpen} onClose={() => setIsDocumentationOpen(false)} />
         </div>
       </DndProvider>
     </HighlightContext.Provider>

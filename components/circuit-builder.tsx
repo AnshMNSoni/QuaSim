@@ -43,17 +43,82 @@ const GateItem = ({ gate, qubit, step, controls = [], onRemove }: GateItemProps)
 
   const getGateColor = (gate: string) => {
     const colors: Record<string, string> = {
+      // Single-qubit gates
       H: "bg-blue-500",
       X: "bg-red-500",
       Y: "bg-green-500",
       Z: "bg-yellow-500",
       S: "bg-purple-500",
       T: "bg-pink-500",
+      I: "bg-slate-500",
+      U: "bg-teal-500",
+      U3: "bg-teal-500",
+      RX: "bg-amber-500",
+      RY: "bg-amber-500",
+      RZ: "bg-amber-500",
+      SX: "bg-fuchsia-500",
+      Phase: "bg-indigo-500",
+      // Multi-qubit gates
       CNOT: "bg-indigo-500",
+      CX: "bg-indigo-500",
+      CY: "bg-indigo-500",
+      CZ: "bg-indigo-500",
+      CRX: "bg-orange-500",
+      CRY: "bg-orange-500",
+      CRZ: "bg-orange-500",
+      CU: "bg-orange-500",
+      CCX: "bg-orange-500",
+      CS: "bg-orange-500",
+      CT: "bg-orange-500",
       SWAP: "bg-orange-500",
+      iSWAP: "bg-orange-500",
+      CSWAP: "bg-orange-500",
+      Fredkin: "bg-orange-500",
+      RXX: "bg-cyan-500",
+      RYY: "bg-cyan-500",
+      RZZ: "bg-cyan-500",
+      XX: "bg-cyan-500",
+      YY: "bg-cyan-500",
+      ZZ: "bg-cyan-500",
+      // Special gates
       M: "bg-gray-500",
+      Barrier: "bg-gray-500",
+      Reset: "bg-gray-500",
+      Delay: "bg-gray-500",
+      Initialize: "bg-gray-500",
+      CONTROL: "bg-gray-400",
     }
     return colors[gate] || "bg-gray-600"
+  }
+
+  const getGateDisplayLabel = (gate: string) => {
+    const displayMap: Record<string, string> = {
+      CNOT: "CX",
+      iSWAP: "iSW",
+      CSWAP: "CSW",
+      Fredkin: "FRD",
+      SX: "√X",
+      Barrier: "||",
+      Reset: "R",
+      Delay: "D",
+      Initialize: "In",
+      Phase: "P",
+      CONTROL: "●",
+    }
+    return displayMap[gate] || gate
+  }
+
+  const getControlLinePosition = (controlQubit: number) => {
+    const distance = Math.abs(controlQubit - qubit)
+    const isAbove = controlQubit < qubit
+    const baseHeight = distance * 40 // Each qubit row is ~40px apart
+
+    return {
+      height: `${baseHeight}px`,
+      top: isAbove ? "-20px" : "40px",
+      left: "50%",
+      transform: "translateX(-50%)",
+    }
   }
 
   return (
@@ -61,23 +126,14 @@ const GateItem = ({ gate, qubit, step, controls = [], onRemove }: GateItemProps)
       <div
         className={`w-8 h-8 sm:w-10 sm:h-10 rounded-md flex items-center justify-center text-white font-bold text-xs sm:text-sm ${getGateColor(gate)}`}
       >
-        {gate === "CNOT" ? (windowWidth < 640 ? "CX" : "CNOT") : gate}
+        {getGateDisplayLabel(gate)}
       </div>
       {controls.map((controlQubit, idx) => (
-        <div
-          key={idx}
-          className="absolute w-1 bg-white"
-          style={{
-            height: `${Math.abs(controlQubit - qubit) * 40}px`,
-            left: "20px",
-            top: controlQubit < qubit ? "-20px" : "40px",
-            transform: "translateY(-50%)",
-          }}
-        />
+        <div key={idx} className="absolute w-1 bg-white" style={getControlLinePosition(controlQubit)} />
       ))}
       <button
         onClick={onRemove}
-        className="absolute -top-2 -right-2 bg-red-500 rounded-full w-5 h-5 flex items-center justify-center text-white"
+        className="absolute -top-2 -right-2 bg-red-500 rounded-full w-5 h-5 flex items-center justify-center text-white hover:bg-red-600"
       >
         <X size={12} />
       </button>
@@ -86,28 +142,113 @@ const GateItem = ({ gate, qubit, step, controls = [], onRemove }: GateItemProps)
 }
 
 export default function CircuitBuilder({ circuit, onAddGate, onRemoveGate }: CircuitBuilderProps) {
+  const [selectedMobileGate, setSelectedMobileGate] = useState<string | null>(null)
   const [selectedControl, setSelectedControl] = useState<number | null>(null)
   const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1024)
-  const [selectedMobileGate, setSelectedMobileGate] = useState<string | null>(null)
 
   useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth)
-    }
-
-    if (typeof window !== "undefined") {
-      window.addEventListener("resize", handleResize)
-      return () => {
-        window.removeEventListener("resize", handleResize)
-      }
-    }
+    const handleResize = () => setWindowWidth(window.innerWidth)
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
   }, [])
 
+  const isDesktop = windowWidth >= 768
+
+  const controlledGates = ["CNOT", "CZ", "CY", "CRX", "CRY", "CRZ", "CU", "CS", "CT", "iSWAP", "CCX", "CSWAP"]
+
+  const mobileGates = [
+    { gate: "H", label: "H" },
+    { gate: "X", label: "X" },
+    { gate: "Y", label: "Y" },
+    { gate: "Z", label: "Z" },
+    { gate: "S", label: "S" },
+    { gate: "T", label: "T" },
+    { gate: "I", label: "I" },
+    { gate: "U", label: "U" },
+    { gate: "U3", label: "U3" },
+    { gate: "RX", label: "RX" },
+    { gate: "RY", label: "RY" },
+    { gate: "RZ", label: "RZ" },
+    { gate: "SX", label: "√X" },
+    { gate: "Phase", label: "P" },
+    { gate: "CNOT", label: "CX" },
+    { gate: "CY", label: "CY" },
+    { gate: "CZ", label: "CZ" },
+    { gate: "CRX", label: "CRX" },
+    { gate: "CRY", label: "CRY" },
+    { gate: "CRZ", label: "CRZ" },
+    { gate: "CU", label: "CU" },
+    { gate: "CCX", label: "CCX" },
+    { gate: "CS", label: "CS" },
+    { gate: "CT", label: "CT" },
+    { gate: "SWAP", label: "⇄" },
+    { gate: "iSWAP", label: "iSW" },
+    { gate: "CSWAP", label: "CSW" },
+    { gate: "Fredkin", label: "FRD" },
+    { gate: "RXX", label: "RXX" },
+    { gate: "RYY", label: "RYY" },
+    { gate: "RZZ", label: "RZZ" },
+    { gate: "XX", label: "XX" },
+    { gate: "YY", label: "YY" },
+    { gate: "ZZ", label: "ZZ" },
+    { gate: "M", label: "M" },
+    { gate: "Barrier", label: "||" },
+    { gate: "Reset", label: "R" },
+    { gate: "Delay", label: "D" },
+    { gate: "Initialize", label: "In" },
+  ]
+
+  const getGateColor = (gate: string) => {
+    const colors: Record<string, string> = {
+      H: "bg-blue-500",
+      X: "bg-red-500",
+      Y: "bg-green-500",
+      Z: "bg-yellow-500",
+      S: "bg-purple-500",
+      T: "bg-pink-500",
+      I: "bg-slate-500",
+      U: "bg-teal-500",
+      U3: "bg-teal-500",
+      RX: "bg-amber-500",
+      RY: "bg-amber-500",
+      RZ: "bg-amber-500",
+      SX: "bg-fuchsia-500",
+      Phase: "bg-indigo-500",
+      CNOT: "bg-indigo-500",
+      CX: "bg-indigo-500",
+      CY: "bg-indigo-500",
+      CZ: "bg-indigo-500",
+      CRX: "bg-orange-500",
+      CRY: "bg-orange-500",
+      CRZ: "bg-orange-500",
+      CU: "bg-orange-500",
+      CCX: "bg-orange-500",
+      CS: "bg-orange-500",
+      CT: "bg-orange-500",
+      SWAP: "bg-orange-500",
+      iSWAP: "bg-orange-500",
+      CSWAP: "bg-orange-500",
+      Fredkin: "bg-orange-500",
+      RXX: "bg-cyan-500",
+      RYY: "bg-cyan-500",
+      RZZ: "bg-cyan-500",
+      XX: "bg-cyan-500",
+      YY: "bg-cyan-500",
+      ZZ: "bg-cyan-500",
+      M: "bg-gray-500",
+      Barrier: "bg-gray-500",
+      Reset: "bg-gray-500",
+      Delay: "bg-gray-500",
+      Initialize: "bg-gray-500",
+    }
+    return colors[gate] || "bg-gray-600"
+  }
+
   const handleGateDrop = (gate: string, qubit: number, step: number) => {
-    if (selectedControl !== null && (gate === "CNOT" || gate === "CZ")) {
+    if (selectedControl !== null && controlledGates.includes(gate)) {
       onAddGate(gate, qubit, selectedControl, step)
       setSelectedControl(null)
-    } else if (gate === "CNOT" || gate === "CZ") {
+    } else if (controlledGates.includes(gate)) {
       setSelectedControl(qubit)
     } else {
       onAddGate(gate, qubit, undefined, step)
@@ -123,7 +264,6 @@ export default function CircuitBuilder({ circuit, onAddGate, onRemoveGate }: Cir
     }
   }
 
-  // Calculate the number of steps needed
   const maxSteps = Math.max(10, circuit.getMaxSteps() + 3)
 
   const DropTarget = ({ qubit, step, onDrop }: DropTargetProps) => {
@@ -138,21 +278,18 @@ export default function CircuitBuilder({ circuit, onAddGate, onRemoveGate }: Cir
       }),
     }))
 
-    // This function will handle mobile taps with the correct qubit
     const handleTap = () => {
       if (selectedMobileGate) {
-        // If a gate is already selected, place it at this qubit and step
-        if (selectedControl !== null && (selectedMobileGate === "CNOT" || selectedMobileGate === "CZ")) {
+        if (selectedControl !== null && controlledGates.includes(selectedMobileGate)) {
           onAddGate(selectedMobileGate, qubit, selectedControl, step)
           setSelectedControl(null)
-        } else if (selectedMobileGate === "CNOT" || selectedMobileGate === "CZ") {
+        } else if (controlledGates.includes(selectedMobileGate)) {
           setSelectedControl(qubit)
         } else {
           onAddGate(selectedMobileGate, qubit, undefined, step)
         }
-        setSelectedMobileGate(null) // Clear selection after placement
+        setSelectedMobileGate(null)
       } else if (selectedControl !== null) {
-        // If a control qubit is selected, use this qubit as target
         if (selectedControl !== qubit) {
           onAddGate("CNOT", qubit, selectedControl, step)
         }
@@ -172,54 +309,34 @@ export default function CircuitBuilder({ circuit, onAddGate, onRemoveGate }: Cir
 
   return (
     <div className="overflow-x-auto">
-      <div className="md:hidden mb-4 p-2 bg-gray-200 dark:bg-gray-700 rounded-lg">
-        <h3 className="text-sm font-semibold mb-2">Select a gate to place:</h3>
-        <div className="flex flex-wrap gap-2">
-          {["H", "X", "Y", "Z", "CNOT", "CZ"].map((gate) => (
-            <button
-              key={gate}
-              onClick={() => setSelectedMobileGate(gate)}
-              className={`w-10 h-10 rounded-md flex items-center justify-center text-white font-bold
-          ${selectedMobileGate === gate ? "ring-2 ring-white" : ""}
-          ${
-            gate === "H"
-              ? "bg-blue-500"
-              : gate === "X"
-                ? "bg-red-500"
-                : gate === "Y"
-                  ? "bg-green-500"
-                  : gate === "Z"
-                    ? "bg-yellow-500"
-                    : gate === "CNOT"
-                      ? "bg-indigo-500"
-                      : gate === "CZ"
-                        ? "bg-purple-500"
-                        : "bg-gray-500"
-          }`}
-            >
-              {gate}
-            </button>
-          ))}
+      {!isDesktop && (
+        <div className="mb-4 p-2 bg-gray-200 dark:bg-gray-700 rounded-lg">
+          <h3 className="text-sm font-semibold mb-2">Select a gate to place</h3>
+
+          <div className="max-h-64 overflow-y-auto p-2 bg-gray-100 dark:bg-gray-800 rounded">
+            <div className="grid grid-cols-3 gap-2">
+              {mobileGates.map((gate) => (
+                <button
+                  key={gate.gate}
+                  onClick={() => setSelectedMobileGate(gate.gate)}
+                  className={`h-10 rounded-md flex items-center justify-center text-white font-bold text-xs
+                    ${getGateColor(gate.gate)}
+                    ${selectedMobileGate === gate.gate ? "ring-2 ring-white" : ""}
+                  `}
+                >
+                  {gate.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {selectedMobileGate && (
-            <button
-              onClick={() => setSelectedMobileGate(null)}
-              className="px-2 py-1 bg-gray-400 dark:bg-gray-600 rounded-md text-sm"
-            >
-              Cancel
-            </button>
+            <p className="text-xs mt-2 text-gray-600 dark:text-gray-300">
+              Tap on the circuit grid to place the {selectedMobileGate} gate
+            </p>
           )}
         </div>
-        {selectedMobileGate && (
-          <p className="text-xs mt-2 text-gray-600 dark:text-gray-300">
-            Tap on the circuit grid to place the {selectedMobileGate} gate
-          </p>
-        )}
-        {selectedControl !== null && (
-          <p className="text-xs mt-2 text-purple-600 dark:text-purple-300">
-            Control qubit q{selectedControl} selected. Tap on a target qubit.
-          </p>
-        )}
-      </div>
+      )}
       <div className="md:hidden mb-4 p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
         <p className="text-xs text-gray-600 dark:text-gray-300">
           <strong>Mobile tip:</strong> Select a gate from above, then tap on the grid to place it. Swipe horizontally to

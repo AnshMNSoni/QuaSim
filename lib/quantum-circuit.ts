@@ -49,7 +49,6 @@ export class QuantumCircuit {
     this.gates[step].push(gate)
   }
 
-  // New method to add a gate at a specific step
   addGateAtStep(gateName: string, qubit: number, step: number, control?: number): void {
     if (qubit >= this.numQubits) return
 
@@ -62,9 +61,19 @@ export class QuantumCircuit {
     const isQubitUsed = this.gates[step].some((gate) => gate.qubit === qubit || gate.controls?.includes(qubit))
     if (isQubitUsed) {
       // If the qubit is already used, find the next available step
-      const nextStep = this.getNextAvailableStep(qubit)
+      const nextStep = this.getNextAvailableStepFrom(qubit, step + 1)
       this.addGateAtStep(gateName, qubit, nextStep, control)
       return
+    }
+
+    // For controlled gates, also check if the control qubit is available at this step
+    if (control !== undefined) {
+      const isControlUsed = this.gates[step].some((gate) => gate.qubit === control || gate.controls?.includes(control))
+      if (isControlUsed) {
+        const nextStep = this.getNextAvailableStepFrom(qubit, step + 1)
+        this.addGateAtStep(gateName, qubit, nextStep, control)
+        return
+      }
     }
 
     const gate: Gate = { name: gateName, qubit }
@@ -127,6 +136,21 @@ export class QuantumCircuit {
     }
 
     // If all steps have the qubit used, add a new step
+    return this.gates.length
+  }
+
+  private getNextAvailableStepFrom(qubit: number, startStep: number): number {
+    for (let i = startStep; i <= this.gates.length; i++) {
+      if (i === this.gates.length) {
+        return i
+      }
+
+      const isQubitUsed = this.gates[i].some((gate) => gate.qubit === qubit || gate.controls?.includes(qubit))
+      if (!isQubitUsed) {
+        return i
+      }
+    }
+
     return this.gates.length
   }
 
