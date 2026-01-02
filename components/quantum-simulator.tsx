@@ -22,6 +22,7 @@ import { HighlightContext } from "@/lib/highlight-context"
 import { Documentation } from "./documentation"
 import { BookOpen } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { UserProfileMenu } from "@/components/user-profile-menu"
 
 export default function QuantumSimulator() {
   const [circuit, setCircuit] = useState<QuantumCircuit>(new QuantumCircuit(2))
@@ -176,6 +177,7 @@ export default function QuantumSimulator() {
                   <GitHubLink />
                   <ThemeToggle />
                   <Support />
+                  <UserProfileMenu />
                 </div>
               </div>
             </header>
