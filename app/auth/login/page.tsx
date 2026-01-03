@@ -60,8 +60,7 @@ export default function LoginPage() {
       setError(error.message)
       setIsLoading(false)
     } else {
-      router.push("/")
-      router.refresh()
+      window.location.href = "/"
     }
   }
 

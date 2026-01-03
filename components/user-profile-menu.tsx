@@ -44,8 +44,7 @@ export function UserProfileMenu() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
-    router.refresh()
-    router.push("/auth/login")
+    window.location.href = "/auth/login"
   }
 
   if (isLoading) {
