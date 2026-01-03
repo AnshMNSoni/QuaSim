@@ -23,10 +23,11 @@ export default function LoginPage() {
   const handleOAuthLogin = async (provider: "google" | "github") => {
     setIsLoading(true)
     setError(null)
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
       },
     })
 
@@ -35,6 +36,7 @@ export default function LoginPage() {
       setIsLoading(false)
     }
   }
+
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault()
