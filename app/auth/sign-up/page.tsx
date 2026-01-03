@@ -18,15 +18,16 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
-  const supabase = createClient()
 
   const handleOAuthLogin = async (provider: "google" | "github") => {
+    const supabase = createClient()
     setIsLoading(true)
     setError(null)
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
       },
     })
 
@@ -35,9 +36,10 @@ export default function LoginPage() {
       setIsLoading(false)
     }
   }
-
+  
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+    const supabase = createClient()
     setIsLoading(true)
     setError(null)
 
