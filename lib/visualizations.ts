@@ -227,7 +227,7 @@ function calculateBlochCoordinates(
   return { x, y, z }
 }
 
-export function drawHistogram(ctx: CanvasRenderingContext2D, probabilities: Record<string, number>): void {
+export function drawHistogram(ctx: CanvasRenderingContext2D, probabilities: Record<string, number>, precision: number = 2): void {
   const width = ctx.canvas.width
   const height = ctx.canvas.height
 
@@ -267,7 +267,7 @@ export function drawHistogram(ctx: CanvasRenderingContext2D, probabilities: Reco
   ctx.textAlign = "right"
   ctx.textBaseline = "middle"
   ctx.fillText("0", 40, height - 50)
-  ctx.fillText(maxProb.toFixed(2), 40, 50)
+  ctx.fillText(maxProb.toFixed(Math.min(precision, 2)), 40, 50)
 
   // Draw bars
   for (let i = 0; i < numStates; i++) {
@@ -289,16 +289,15 @@ export function drawHistogram(ctx: CanvasRenderingContext2D, probabilities: Reco
     ctx.textBaseline = "top"
     ctx.fillText(state, x + barWidth / 2, height - 45)
 
-    // Draw probability value
     if (barHeight > 20) {
       ctx.textAlign = "center"
       ctx.textBaseline = "bottom"
-      ctx.fillText(prob.toFixed(2), x + barWidth / 2, y)
+      ctx.fillText(prob.toFixed(Math.min(precision, 3)), x + barWidth / 2, y)
     }
   }
 }
 
-export function drawStateVector(ctx: CanvasRenderingContext2D, stateVector: Complex[]): void {
+export function drawStateVector(ctx: CanvasRenderingContext2D, stateVector: Complex[], precision: number = 2, showPhaseAngles: boolean = true): void {
   const width = ctx.canvas.width
   const height = ctx.canvas.height
 
@@ -346,15 +345,17 @@ export function drawStateVector(ctx: CanvasRenderingContext2D, stateVector: Comp
     const barHeight = (height / 2 - 80) * mag
     const x = 50 + i * (barWidth + barSpacing)
 
-    // Draw magnitude bar
-    ctx.fillStyle = `hsl(${(phase + 180) % 360}, 70%, 60%)`
+    const barColor = showPhaseAngles ? `hsl(${(phase + 180) % 360}, 70%, 60%)` : `hsl(240, 70%, 60%)`
+    ctx.fillStyle = barColor
     ctx.fillRect(x, height / 2 - barHeight, barWidth, barHeight)
 
-    // Draw phase indicator
-    ctx.fillStyle = "white"
-    ctx.beginPath()
-    ctx.arc(x + barWidth / 2, height / 2 - barHeight - 10, 5, 0, 2 * Math.PI)
-    ctx.fill()
+    // Draw phase indicator only if showPhaseAngles is true
+    if (showPhaseAngles) {
+      ctx.fillStyle = "white"
+      ctx.beginPath()
+      ctx.arc(x + barWidth / 2, height / 2 - barHeight - 10, 5, 0, 2 * Math.PI)
+      ctx.fill()
+    }
 
     // Draw state label
     ctx.fillStyle = "white"
@@ -363,10 +364,13 @@ export function drawStateVector(ctx: CanvasRenderingContext2D, stateVector: Comp
     ctx.textBaseline = "top"
     ctx.fillText(`|${stateBinary}⟩`, x + barWidth / 2, height / 2 + 10)
 
-    // Draw amplitude value
     ctx.textAlign = "center"
     ctx.textBaseline = "bottom"
-    ctx.fillText(`${mag.toFixed(2)}∠${phase.toFixed(0)}°`, x + barWidth / 2, height / 2 - barHeight - 15)
+    if (showPhaseAngles) {
+      ctx.fillText(`${mag.toFixed(precision)}∠${phase.toFixed(Math.max(precision - 2, 0))}°`, x + barWidth / 2, height / 2 - barHeight - 15)
+    } else {
+      ctx.fillText(`${mag.toFixed(precision)}`, x + barWidth / 2, height / 2 - barHeight - 15)
+    }
   }
 
   // Draw legend
@@ -374,25 +378,30 @@ export function drawStateVector(ctx: CanvasRenderingContext2D, stateVector: Comp
   ctx.font = "14px Arial"
   ctx.textAlign = "left"
   ctx.textBaseline = "middle"
-  ctx.fillText("Amplitude = magnitude∠phase", 50, height - 50)
+  
+  if (showPhaseAngles) {
+    ctx.fillText("Amplitude = magnitude∠phase", 50, height - 50)
 
-  // Draw color scale for phase
-  const scaleWidth = 200
-  const scaleHeight = 20
-  const scaleX = width - 50 - scaleWidth
-  const scaleY = height - 50
+    // Draw color scale for phase
+    const scaleWidth = 200
+    const scaleHeight = 20
+    const scaleX = width - 50 - scaleWidth
+    const scaleY = height - 50
 
-  for (let i = 0; i < scaleWidth; i++) {
-    const hue = (i / scaleWidth) * 360
-    ctx.fillStyle = `hsl(${hue}, 70%, 60%)`
-    ctx.fillRect(scaleX + i, scaleY, 1, scaleHeight)
+    for (let i = 0; i < scaleWidth; i++) {
+      const hue = (i / scaleWidth) * 360
+      ctx.fillStyle = `hsl(${hue}, 70%, 60%)`
+      ctx.fillRect(scaleX + i, scaleY, 1, scaleHeight)
+    }
+
+    ctx.fillStyle = "white"
+    ctx.textAlign = "center"
+    ctx.textBaseline = "top"
+    ctx.fillText("-180°", scaleX, scaleY + scaleHeight + 5)
+    ctx.fillText("0°", scaleX + scaleWidth / 2, scaleY + scaleHeight + 5)
+    ctx.fillText("180°", scaleX + scaleWidth, scaleY + scaleHeight + 5)
+    ctx.fillText("Phase", scaleX + scaleWidth / 2, scaleY + scaleHeight + 25)
+  } else {
+    ctx.fillText("Amplitude = magnitude", 50, height - 50)
   }
-
-  ctx.fillStyle = "white"
-  ctx.textAlign = "center"
-  ctx.textBaseline = "top"
-  ctx.fillText("-180°", scaleX, scaleY + scaleHeight + 5)
-  ctx.fillText("0°", scaleX + scaleWidth / 2, scaleY + scaleHeight + 5)
-  ctx.fillText("180°", scaleX + scaleWidth, scaleY + scaleHeight + 5)
-  ctx.fillText("Phase", scaleX + scaleWidth / 2, scaleY + scaleHeight + 25)
 }
