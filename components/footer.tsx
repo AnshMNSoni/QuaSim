@@ -32,16 +32,6 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="https://quantum-computing.ibm.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-gray-600 hover:text-purple-600 dark:text-gray-400 dark:hover:text-purple-400 transition-colors"
-                >
-                  IBM Quantum
-                </a>
-              </li>
-              <li>
-                <a
                   href="https://en.wikipedia.org/wiki/Quantum_computing"
                   target="_blank"
                   rel="noopener noreferrer"
