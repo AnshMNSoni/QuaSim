@@ -21,8 +21,18 @@ export default function LoginPage() {
   const supabase = createClient()
 
   const handleOAuthLogin = async (provider: "google" | "github") => {
+    const isPreview =
+      window.location.hostname.includes("--") &&
+      window.location.hostname.includes("netlify.app")
+
+    if (isPreview) {
+      alert("OAuth login only works on the production URL.")
+      return
+    }
+
     setIsLoading(true)
     setError(null)
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {

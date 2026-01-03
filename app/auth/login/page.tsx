@@ -21,20 +21,30 @@ export default function LoginPage() {
   const supabase = createClient()
 
   const handleOAuthLogin = async (provider: "google" | "github") => {
-    setIsLoading(true)
-    setError(null)
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
+  const isPreview =
+    window.location.hostname.includes("--") &&
+    window.location.hostname.includes("netlify.app")
 
-    if (error) {
-      setError(error.message)
-      setIsLoading(false)
-    }
+  if (isPreview) {
+    alert("OAuth login only works on the production URL.")
+    return
   }
+
+  setIsLoading(true)
+  setError(null)
+
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: {
+      redirectTo: `${window.location.origin}/auth/callback`,
+    },
+  })
+
+  if (error) {
+    setError(error.message)
+    setIsLoading(false)
+  }
+}
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault()
