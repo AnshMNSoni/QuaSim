@@ -64,10 +64,13 @@ const RZ_GATE = (angle: number) => [
 ]
 
 const U_GATE = (theta: number, phi: number, lambda: number) => [
-  [new Complex(Math.cos(theta / 2)), new Complex(-Math.cos(lambda), -Math.sin(lambda)) * Math.sin(theta / 2)],
   [
-    new Complex(Math.cos(phi), Math.sin(phi)) * Math.sin(theta / 2),
-    new Complex(Math.cos(phi + lambda), Math.sin(phi + lambda)) * Math.cos(theta / 2),
+    new Complex(Math.cos(theta / 2)),
+    new Complex(-Math.sin(theta / 2)).multiply(new Complex(Math.cos(lambda), Math.sin(lambda))),
+  ],
+  [
+    new Complex(Math.sin(theta / 2)).multiply(new Complex(Math.cos(phi), Math.sin(phi))),
+    new Complex(Math.cos(theta / 2)).multiply(new Complex(Math.cos(phi + lambda), Math.sin(phi + lambda))),
   ],
 ]
 
@@ -104,7 +107,10 @@ export async function simulateCircuit(circuit: QuantumCircuit): Promise<Simulati
 }
 
 function applyGate(stateVector: Complex[], gate: any, numQubits: number): Complex[] {
-  const { name, qubit, controls } = gate
+  const { name, qubit, controls, params } = gate
+  const angle = params?.theta ?? params?.angle ?? Math.PI / 4
+  const phi = params?.phi ?? 0
+  const lambda = params?.lambda ?? 0
 
   switch (name) {
     case "H":
@@ -124,17 +130,16 @@ function applyGate(stateVector: Complex[], gate: any, numQubits: number): Comple
     case "SX":
       return applySingleQubitGate(stateVector, SX_GATE, qubit, numQubits)
     case "U":
-      return applySingleQubitGate(stateVector, U_GATE(Math.PI / 4, 0, 0), qubit, numQubits)
     case "U3":
-      return applySingleQubitGate(stateVector, U_GATE(Math.PI / 4, 0, 0), qubit, numQubits)
+      return applySingleQubitGate(stateVector, U_GATE(angle, phi, lambda), qubit, numQubits)
     case "RX":
-      return applySingleQubitGate(stateVector, RX_GATE(Math.PI / 4), qubit, numQubits)
+      return applySingleQubitGate(stateVector, RX_GATE(angle), qubit, numQubits)
     case "RY":
-      return applySingleQubitGate(stateVector, RY_GATE(Math.PI / 4), qubit, numQubits)
+      return applySingleQubitGate(stateVector, RY_GATE(angle), qubit, numQubits)
     case "RZ":
-      return applySingleQubitGate(stateVector, RZ_GATE(Math.PI / 4), qubit, numQubits)
+      return applySingleQubitGate(stateVector, RZ_GATE(angle), qubit, numQubits)
     case "Phase":
-      return applySingleQubitGate(stateVector, PHASE_GATE(Math.PI / 4), qubit, numQubits)
+      return applySingleQubitGate(stateVector, PHASE_GATE(angle), qubit, numQubits)
     case "CNOT":
       return applyControlledGate(stateVector, X_GATE, qubit, controls![0], numQubits)
     case "CY":
@@ -142,26 +147,25 @@ function applyGate(stateVector: Complex[], gate: any, numQubits: number): Comple
     case "CZ":
       return applyControlledGate(stateVector, Z_GATE, qubit, controls![0], numQubits)
     case "CRX":
-      return applyControlledGate(stateVector, RX_GATE(Math.PI / 4), qubit, controls![0], numQubits)
+      return applyControlledGate(stateVector, RX_GATE(angle), qubit, controls![0], numQubits)
     case "CRY":
-      return applyControlledGate(stateVector, RY_GATE(Math.PI / 4), qubit, controls![0], numQubits)
+      return applyControlledGate(stateVector, RY_GATE(angle), qubit, controls![0], numQubits)
     case "CRZ":
-      return applyControlledGate(stateVector, RZ_GATE(Math.PI / 4), qubit, controls![0], numQubits)
+      return applyControlledGate(stateVector, RZ_GATE(angle), qubit, controls![0], numQubits)
     case "CU":
-      return applyControlledGate(stateVector, U_GATE(Math.PI / 4, 0, 0), qubit, controls![0], numQubits)
+      return applyControlledGate(stateVector, U_GATE(angle, phi, lambda), qubit, controls![0], numQubits)
     case "CS":
       return applyControlledGate(stateVector, S_GATE, qubit, controls![0], numQubits)
     case "CT":
       return applyControlledGate(stateVector, T_GATE, qubit, controls![0], numQubits)
     case "CCX":
-      // Toffoli gate - controlled controlled X
-      return applyToffoliGate(stateVector, qubit, controls![0], numQubits)
+      return applyToffoliGate(stateVector, qubit, controls![0], numQubits, controls!.length > 1 ? controls![1] : undefined)
     case "CSWAP":
     case "Fredkin":
       return applyControlledSwapGate(stateVector, qubit, controls![0], numQubits)
     case "SWAP":
     case "iSWAP":
-      return applySwapGate(stateVector, qubit, controls![0], numQubits)
+      return applySwapGate(stateVector, qubit, controls![0], numQubits, name === "iSWAP")
     case "RXX":
     case "RYY":
     case "RZZ":
@@ -215,30 +219,35 @@ function applyControlledGate(
 ): Complex[] {
   const newStateVector = Array(stateVector.length)
     .fill(null)
-    .map((_, i) => new Complex(stateVector[i].real, stateVector[i].imag))
+    .map(() => new Complex(0))
 
   for (let i = 0; i < stateVector.length; i++) {
     // Check if the control qubit is 1
     const controlBit = (i >> controlQubit) & 1
 
     if (controlBit === 1) {
-      // Apply the gate to the target qubit
+      // Control is active - apply the gate to the target qubit
       const targetBit = (i >> targetQubit) & 1
 
-      // Calculate the new state index with the target bit flipped
-      const newTargetBit = targetBit === 0 ? 1 : 0
-      const newIndex = (i & ~(1 << targetQubit)) | (newTargetBit << targetQubit)
-
-      // Apply the gate element
-      newStateVector[i] = new Complex(0)
-      newStateVector[newIndex] = stateVector[i].multiply(gate[newTargetBit][targetBit])
+      // Apply the full 2x2 gate matrix
+      for (let j = 0; j < 2; j++) {
+        const newTargetBit = j
+        const newIndex = (i & ~(1 << targetQubit)) | (newTargetBit << targetQubit)
+        
+        // Apply the gate element: gate[output][input]
+        const contribution = stateVector[i].multiply(gate[newTargetBit][targetBit])
+        newStateVector[newIndex] = newStateVector[newIndex].add(contribution)
+      }
+    } else {
+      // Control is not active - identity operation (copy state unchanged)
+      newStateVector[i] = new Complex(stateVector[i].real, stateVector[i].imag)
     }
   }
 
   return newStateVector
 }
 
-function applySwapGate(stateVector: Complex[], qubit1: number, qubit2: number, numQubits: number): Complex[] {
+function applySwapGate(stateVector: Complex[], qubit1: number, qubit2: number, numQubits: number, isISWAP = false): Complex[] {
   const newStateVector = Array(stateVector.length)
     .fill(null)
     .map(() => new Complex(0))
@@ -250,11 +259,18 @@ function applySwapGate(stateVector: Complex[], qubit1: number, qubit2: number, n
 
     // If the bits are the same, the state doesn't change
     if (bit1 === bit2) {
-      newStateVector[i] = stateVector[i]
+      newStateVector[i] = new Complex(stateVector[i].real, stateVector[i].imag)
     } else {
       // Swap the bits
       const newIndex = i ^ (1 << qubit1) ^ (1 << qubit2)
-      newStateVector[newIndex] = stateVector[i]
+      
+      // For iSWAP, apply phase factor i when swapping |01⟩ ↔ |10⟩
+      if (isISWAP && bit1 === 1 && bit2 === 0) {
+        // Multiply by i
+        newStateVector[newIndex] = new Complex(-stateVector[i].imag, stateVector[i].real)
+      } else {
+        newStateVector[newIndex] = new Complex(stateVector[i].real, stateVector[i].imag)
+      }
     }
   }
 
@@ -270,21 +286,23 @@ function applyToffoliGate(
 ): Complex[] {
   const newStateVector = Array(stateVector.length)
     .fill(null)
-    .map((_, i) => new Complex(stateVector[i].real, stateVector[i].imag))
+    .map(() => new Complex(0))
 
   for (let i = 0; i < stateVector.length; i++) {
-    // Check if both control qubits are 1 (CCX has implicit second control in controls array)
+    // Check if both control qubits are 1
     const control1Bit = (i >> control1Qubit) & 1
     const control2Bit = control2Qubit !== undefined ? (i >> control2Qubit) & 1 : 1
 
     if (control1Bit === 1 && control2Bit === 1) {
-      // Apply X gate to the target qubit
+      // Both controls active - apply X gate to target qubit
       const targetBit = (i >> targetQubit) & 1
-      const newTargetBit = targetBit === 0 ? 1 : 0
+      const newTargetBit = 1 - targetBit
       const newIndex = (i & ~(1 << targetQubit)) | (newTargetBit << targetQubit)
 
-      newStateVector[i] = new Complex(0)
-      newStateVector[newIndex] = stateVector[i]
+      newStateVector[newIndex] = new Complex(stateVector[i].real, stateVector[i].imag)
+    } else {
+      // At least one control is not active - identity operation
+      newStateVector[i] = new Complex(stateVector[i].real, stateVector[i].imag)
     }
   }
 
@@ -311,12 +329,12 @@ function applyControlledSwapGate(
 
       if (bit1 !== bit2) {
         const newIndex = i ^ (1 << qubit1) ^ (1 << (qubit1 + 1))
-        newStateVector[newIndex] = stateVector[i]
+        newStateVector[newIndex] = new Complex(stateVector[i].real, stateVector[i].imag)
       } else {
-        newStateVector[i] = stateVector[i]
+        newStateVector[i] = new Complex(stateVector[i].real, stateVector[i].imag)
       }
     } else {
-      newStateVector[i] = stateVector[i]
+      newStateVector[i] = new Complex(stateVector[i].real, stateVector[i].imag)
     }
   }
 
@@ -330,7 +348,6 @@ function applyTwoQubitInteractionGate(
   qubit2: number,
   numQubits: number,
 ): Complex[] {
-  // For RXX, RYY, RZZ, XX, YY, ZZ gates - apply interaction between two qubits
   const newStateVector = Array(stateVector.length)
     .fill(null)
     .map(() => new Complex(0))
@@ -347,32 +364,38 @@ function applyTwoQubitInteractionGate(
     switch (gateName) {
       case "XX":
       case "RXX":
+        // RXX rotates in the XX basis: exp(-i θ/2 X⊗X)
         if (bit1 !== bit2) {
+          // Flip both qubits
           newIndex = i ^ (1 << qubit1) ^ (1 << qubit2)
-          phase = new Complex(Math.cos(angle / 2), 0)
+          phase = new Complex(0, -Math.sin(angle / 2))
         } else {
-          phase = new Complex(Math.cos(angle / 2), -Math.sin(angle / 2))
+          phase = new Complex(Math.cos(angle / 2), 0)
         }
         break
       case "YY":
       case "RYY":
+        // RYY rotates in the YY basis: exp(-i θ/2 Y⊗Y)
         if (bit1 !== bit2) {
           newIndex = i ^ (1 << qubit1) ^ (1 << qubit2)
-          phase = new Complex(Math.cos(angle / 2), 0)
+          phase = new Complex(0, Math.sin(angle / 2))
         } else {
-          phase = new Complex(Math.cos(angle / 2), Math.sin(angle / 2))
+          phase = new Complex(Math.cos(angle / 2), 0)
         }
         break
       case "ZZ":
       case "RZZ":
-        phase =
-          bit1 === bit2
-            ? new Complex(Math.cos(angle / 2), -Math.sin(angle / 2))
-            : new Complex(Math.cos(angle / 2), Math.sin(angle / 2))
+        // RZZ rotates in the ZZ basis: exp(-i θ/2 Z⊗Z)
+        const parity = bit1 ^ bit2
+        phase = new Complex(
+          Math.cos(angle / 2),
+          parity === 0 ? -Math.sin(angle / 2) : Math.sin(angle / 2)
+        )
         break
     }
 
-    newStateVector[newIndex] = newStateVector[newIndex].add(stateVector[i].multiply(phase))
+    const contribution = stateVector[i].multiply(phase)
+    newStateVector[newIndex] = newStateVector[newIndex].add(contribution)
   }
 
   return newStateVector

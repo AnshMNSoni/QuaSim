@@ -36,7 +36,7 @@ export function drawCircuitDiagram(ctx: CanvasRenderingContext2D, circuit: Quant
 
   for (let step = 0; step < circuit.gates.length; step++) {
     for (const gate of circuit.gates[step]) {
-      const x = 50 + step * gateSpacing
+      const x = 70 + step * gateSpacing
       const y = (gate.qubit + 1) * lineSpacing
 
       // Draw gate

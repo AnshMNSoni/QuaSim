@@ -134,7 +134,7 @@ You're here to make quantum computing accessible and fun!`
 
     const genAI = new GoogleGenerativeAI(apiKey)
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
+      model: "gemini-pro",
       generationConfig: {
         temperature: 0.7,
         maxOutputTokens: 500,
@@ -142,7 +142,26 @@ You're here to make quantum computing accessible and fun!`
     })
 
     const prompt = `${systemPrompt}\n\nUser Question: ${messages[messages.length - 1].content}`
-    const result = await model.generateContent(prompt)
+    let result
+    try {
+      result = await model.generateContent(prompt)
+    } catch (apiError: any) {
+      console.error("[AI Assist] Gemini API Error:", {
+        message: apiError?.message || "Unknown API error",
+        status: apiError?.status || "No status",
+        statusText: apiError?.statusText || "No status text",
+        details: apiError,
+      })
+
+      return Response.json(
+        {
+          error: `Gemini API Error: ${apiError?.message || "Unable to connect to AI model. Please verify your API key and try again."}`,
+          success: false,
+        },
+        { status: 500 },
+      )
+    }
+
     const text = result.response.text()
 
     console.log("[AI Assist] Response generated successfully")

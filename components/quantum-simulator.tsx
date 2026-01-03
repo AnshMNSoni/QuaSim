@@ -17,7 +17,7 @@ import { ThemeToggle } from "./theme-toggle"
 import { GitHubLink } from "./github-link"
 import { Footer } from "./footer"
 import { Support } from "./support"
-import { AIAssistant } from "./ai-assistant"
+// import { AIAssistant } from "./ai-assistant"
 import { HighlightContext } from "@/lib/highlight-context"
 import { Documentation } from "./documentation"
 import { BookOpen } from "lucide-react"
@@ -379,12 +379,12 @@ export default function QuantumSimulator() {
             </div>
           </div>
           <Footer />
-          <AIAssistant
+          {/* <AIAssistant
             circuit={circuit}
             activeVisualization={activeVisualization}
             userAction={userAction}
             onHighlightElement={setHighlightedElement}
-          />
+          /> */}
           <Documentation isOpen={isDocumentationOpen} onClose={() => setIsDocumentationOpen(false)} />
         </div>
       </DndProvider>
