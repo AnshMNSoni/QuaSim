@@ -270,7 +270,7 @@ export default function SettingsPage() {
                 </Button>
                 <Button onClick={resetSettings} variant="outline" className="flex-1 bg-transparent">
                   <RotateCcw className="mr-2 h-4 w-4" />
-                  Reset to Default
+                  Reset
                 </Button>
               </div>
 
@@ -298,8 +298,7 @@ export default function SettingsPage() {
                 <strong>QuaSim</strong> is an interactive quantum circuit simulator designed to help students and
                 developers learn quantum computing through visualization and experimentation.
               </p>
-              <p>Version 1.0.0</p>
-              <p>Built with Next.js, React, and Tailwind CSS. Powered by custom quantum simulation algorithms.</p>
+              <p className="text-purple-600 hover:bg-purple-700">Version 0.2.0</p>
             </CardContent>
           </Card>
         </div>
