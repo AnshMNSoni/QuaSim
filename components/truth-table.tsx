@@ -5,9 +5,10 @@ import type { QuantumCircuit } from "@/lib/quantum-circuit"
 interface TruthTableProps {
   result: SimulationResult
   circuit: QuantumCircuit
+  precision?: number
 }
 
-export default function TruthTable({ result, circuit }: TruthTableProps) {
+export default function TruthTable({ result, circuit, precision = 6 }: TruthTableProps) {
   const numQubits = circuit.numQubits
   const numStates = Math.pow(2, numQubits)
 
@@ -38,7 +39,7 @@ export default function TruthTable({ result, circuit }: TruthTableProps) {
 
   // Format probability as percentage
   const formatProbability = (prob: number) => {
-    return (prob * 100).toFixed(2) + "%"
+    return (prob * 100).toFixed(Math.min(precision, 2)) + "%"
   }
 
   // Get amplitude information
@@ -105,10 +106,10 @@ export default function TruthTable({ result, circuit }: TruthTableProps) {
                     </div>
                   </td>
                   <td className="border border-gray-300 dark:border-gray-600 px-3 py-2 font-mono text-xs">
-                    {amplitude.real.toFixed(3)} + {amplitude.imag.toFixed(3)}i
+                    {amplitude.real.toFixed(precision)} + {amplitude.imag.toFixed(precision)}i
                   </td>
                   <td className="border border-gray-300 dark:border-gray-600 px-3 py-2 font-mono text-xs">
-                    {amplitude.phase.toFixed(3)}
+                    {amplitude.phase.toFixed(precision)}
                   </td>
                 </tr>
               )

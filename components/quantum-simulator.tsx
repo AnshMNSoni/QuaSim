@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import CircuitBuilder from "./circuit-builder"
 import VisualizationPanel from "./visualization-panel"
 import TruthTable from "./truth-table"
@@ -22,7 +22,9 @@ import { HighlightContext } from "@/lib/highlight-context"
 import { Documentation } from "./documentation"
 import { BookOpen } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { UserProfileMenu } from "@/components/user-profile-menu"
+import { UserProfileMenu } from "./user-profile-menu"
+import html2canvas from "html2canvas"
+import { useSettings } from "@/lib/hooks/use-settings"
 
 export default function QuantumSimulator() {
   const [circuit, setCircuit] = useState<QuantumCircuit>(new QuantumCircuit(2))
@@ -31,9 +33,20 @@ export default function QuantumSimulator() {
   const [isSimulating, setIsSimulating] = useState(false)
   const [userAction, setUserAction] = useState<string>("exploring the simulator")
   const [highlightedElement, setHighlightedElement] = useState<string | null>(null)
-  const [selectedMobileGate, setSelectedMobileGate] = useState<string | null>(null)
   const [isDocumentationOpen, setIsDocumentationOpen] = useState(false)
+  const visualizationPanelRef = useRef<HTMLDivElement>(null)
   const { toast } = useToast()
+
+  const { settings, isLoaded } = useSettings()
+
+  useEffect(() => {
+    if (isLoaded && settings.autoSimulate && circuit.getMaxSteps() > 0 && !isSimulating) {
+      const timer = setTimeout(() => {
+        handleSimulate()
+      }, 500)
+      return () => clearTimeout(timer)
+    }
+  }, [circuit, settings.autoSimulate, isLoaded])
 
   const handleAddQubit = () => {
     setUserAction("adding a qubit to the circuit")
@@ -149,6 +162,47 @@ export default function QuantumSimulator() {
     reader.readAsText(file)
   }
 
+  const handleExportPNG = async () => {
+    if (!visualizationPanelRef.current || !simulationResult) {
+      toast({
+        title: "No simulation to export",
+        description: "Please run a simulation first before exporting as PNG.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setUserAction("exporting simulation as image")
+
+    try {
+      const canvas = await html2canvas(visualizationPanelRef.current, {
+        backgroundColor: document.documentElement.classList.contains("dark") ? "#1f2937" : "#ffffff",
+        scale: 2, // Higher quality export
+        logging: false,
+      })
+
+      const dataURL = canvas.toDataURL("image/png")
+      const link = document.createElement("a")
+      link.href = dataURL
+      link.download = "circuit.png"
+      link.click()
+
+      toast({
+        title: "Simulation exported",
+        description: "Your simulation has been saved as circuit.png",
+      })
+    } catch (error) {
+      toast({
+        title: "Export failed",
+        description: "Failed to export simulation as PNG. Please try again.",
+        variant: "destructive",
+      })
+      console.error("PNG export error:", error)
+    }
+  }
+
+  const hasCircuitGates = circuit.getMaxSteps() > 0
+
   return (
     <HighlightContext.Provider value={{ highlightedElement, highlightElement: setHighlightedElement }}>
       <DndProvider backend={HTML5Backend}>
@@ -190,12 +244,7 @@ export default function QuantumSimulator() {
                   highlightedElement === "gate-selector" ? "highlight-element" : ""
                 }`}
               >
-                <GateSelector
-                  onSelectGate={handleAddGate}
-                  circuit={circuit}
-                  selectedMobileGate={selectedMobileGate}
-                  onMobileGateSelect={setSelectedMobileGate}
-                />
+                <GateSelector onSelectGate={handleAddGate} circuit={circuit} />
               </div>
 
               <div className="lg:col-span-3 space-y-4 sm:space-y-6">
@@ -211,11 +260,12 @@ export default function QuantumSimulator() {
                     onRemoveQubit={handleRemoveQubit}
                     onClearCircuit={handleClearCircuit}
                     onSimulate={handleSimulate}
-                    onExportCircuit={handleExportCircuit}
-                    onImportCircuit={handleImportCircuit}
+                    onExportPNG={handleExportPNG}
                     isSimulating={isSimulating}
                     numQubits={circuit.numQubits}
+                    hasCircuit={!!simulationResult}
                   />
+                  {/* Removed unused onExportCircuit and onImportCircuit props */}
                 </div>
 
                 {/* Circuit Builder */}
@@ -225,14 +275,13 @@ export default function QuantumSimulator() {
                     highlightedElement === "circuit-builder" ? "highlight-element" : ""
                   }`}
                 >
-                  <div className="overflow-x-auto -mx-3 sm:-mx-4 px-3 sm:px-4 pb-2">
-                    <CircuitBuilder circuit={circuit} onAddGate={handleAddGate} onRemoveGate={handleRemoveGate} />
-                  </div>
+                  <CircuitBuilder circuit={circuit} onAddGate={handleAddGate} onRemoveGate={handleRemoveGate} />
                 </div>
 
                 {simulationResult && (
                   <div
                     id="visualization-panel"
+                    ref={visualizationPanelRef}
                     className={`bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 shadow-lg ${
                       highlightedElement === "visualization-panel" ? "highlight-element" : ""
                     }`}
@@ -311,12 +360,16 @@ export default function QuantumSimulator() {
                       </div>
 
                       {activeVisualization === "truthTable" ? (
-                        <TruthTable result={simulationResult} circuit={circuit} />
+                        <TruthTable result={simulationResult} circuit={circuit} precision={settings.precision} />
                       ) : (
                         <VisualizationPanel
                           result={simulationResult}
                           circuit={circuit}
                           activeVisualization={activeVisualization}
+                          precision={settings.precision}
+                          showPhaseAngles={settings.showPhaseAngles}
+                          enableAnimations={settings.enableAnimations}
+                          enableParticleEffects={settings.enableParticleEffects}
                         />
                       )}
                     </div>

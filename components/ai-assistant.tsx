@@ -53,18 +53,27 @@ export function AIAssistant({
     }
   }, [messages, onHighlightElement])
 
-  // Initial greeting
   useEffect(() => {
     if (isOpen && messages.length === 0) {
       const greeting: Message = {
         id: "greeting",
         role: "assistant",
-        content: `👋 Hi! I'm your Quantum Circuit Assistant. I can help you understand quantum computing, guide you through QuaSim, or answer anything about quantum gates. What would you like to know?`,
+        content: `Welcome to QuaSim! I'm your quantum computing guide.
+
+QuaSim is an interactive quantum circuit simulator where you can:
+• Build quantum circuits with 40+ gates (drag-and-drop or tap)
+• Visualize quantum states with Bloch spheres, histograms, and state vectors
+• Learn quantum concepts like superposition, entanglement, and interference
+• Export circuits as JSON or PNG images
+
+Currently, you have ${circuit.numQubits} qubit${circuit.numQubits !== 1 ? "s" : ""} in your circuit. Try adding gates from the left panel, or ask me anything about quantum computing!
+
+What would you like to explore?`,
         timestamp: new Date(),
       }
       setMessages([greeting])
     }
-  }, [isOpen, messages.length])
+  }, [isOpen, messages.length, circuit.numQubits])
 
   // Auto scroll chat
   useEffect(() => {
@@ -72,6 +81,28 @@ export function AIAssistant({
       scrollRef.current.scrollIntoView({ behavior: "smooth" })
     }
   }, [messages])
+
+  const getCircuitContext = () => {
+    const gateNames = new Set<string>()
+    const maxSteps = circuit.getMaxSteps()
+
+    for (let step = 0; step < maxSteps; step++) {
+      for (let qubit = 0; qubit < circuit.numQubits; qubit++) {
+        const gate = circuit.getGateAt(step, qubit)
+        if (gate) {
+          gateNames.add(gate.name)
+        }
+      }
+    }
+
+    return {
+      numQubits: circuit.numQubits,
+      activeVisualization,
+      userAction,
+      gateList: gateNames.size > 0 ? Array.from(gateNames).join(", ") : "None",
+      circuitDepth: maxSteps,
+    }
+  }
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -94,15 +125,13 @@ export function AIAssistant({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: [...messages, userMessage],
-          context: {
-            numQubits: circuit.numQubits,
-            activeVisualization,
-            userAction,
-          },
+          context: getCircuitContext(),
         }),
       })
 
       const data = await response.json()
+
+      console.log("[v0] AI Assist response:", data)
 
       if (data.success) {
         const assistantMessage: Message = {
@@ -114,24 +143,25 @@ export function AIAssistant({
         }
         setMessages((prev) => [...prev, assistantMessage])
       } else {
+        const errorMessage = data.error || "Sorry, something went wrong. Try again."
         setMessages((prev) => [
           ...prev,
           {
             id: `error-${Date.now()}`,
             role: "assistant",
-            content: "Sorry, something went wrong. Try again.",
+            content: errorMessage,
             timestamp: new Date(),
           },
         ])
       }
     } catch (error) {
-      console.error("[AI Assist Error]:", error)
+      console.error("[v0] AI Assist Error:", error)
       setMessages((prev) => [
         ...prev,
         {
           id: `error-${Date.now()}`,
           role: "assistant",
-          content: "Connection issue — please try again.",
+          content: "Connection issue — please check your network and try again.",
           timestamp: new Date(),
         },
       ])
@@ -185,7 +215,7 @@ export function AIAssistant({
           {messages.map((message) => (
             <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
               <div
-                className={`max-w-[80%] md:max-w-xs px-3 py-2 rounded-lg text-sm ${
+                className={`max-w-[85%] px-3 py-2 rounded-lg text-sm whitespace-pre-line ${
                   message.role === "user"
                     ? "bg-purple-500 text-white rounded-br-none"
                     : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-bl-none"
@@ -216,7 +246,12 @@ export function AIAssistant({
             disabled={isLoading}
             className="text-sm"
           />
-          <Button type="submit" disabled={isLoading || !input.trim()} size="sm" className="bg-purple-500 hover:bg-purple-600">
+          <Button
+            type="submit"
+            disabled={isLoading || !input.trim()}
+            size="sm"
+            className="bg-purple-500 hover:bg-purple-600"
+          >
             <Send className="w-4 h-4" />
           </Button>
         </div>

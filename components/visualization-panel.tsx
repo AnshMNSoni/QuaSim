@@ -9,9 +9,17 @@ interface VisualizationPanelProps {
   result: SimulationResult
   circuit: QuantumCircuit
   activeVisualization: string
+  precision?: number
+  showPhaseAngles?: boolean
 }
 
-export default function VisualizationPanel({ result, circuit, activeVisualization }: VisualizationPanelProps) {
+export default function VisualizationPanel({ 
+  result, 
+  circuit, 
+  activeVisualization,
+  precision = 6,
+  showPhaseAngles = true
+}: VisualizationPanelProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -36,13 +44,13 @@ export default function VisualizationPanel({ result, circuit, activeVisualizatio
     } else if (activeVisualization === "histogram") {
       canvas.width = 800
       canvas.height = 400
-      drawHistogram(ctx, result.probabilities)
+      drawHistogram(ctx, result.probabilities, precision)
     } else if (activeVisualization === "statevector") {
       canvas.width = 800
       canvas.height = 400
-      drawStateVector(ctx, result.stateVector)
+      drawStateVector(ctx, result.stateVector, precision, showPhaseAngles)
     }
-  }, [result, circuit, activeVisualization])
+  }, [result, circuit, activeVisualization, precision, showPhaseAngles])
 
   return (
     <div className="visualization-container overflow-auto">
