@@ -1,10 +1,20 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-import { middleware as supabaseMiddleware } from "./lib/supabase/middleware"
 
 export function middleware(req: NextRequest) {
-  // Run the Netlify preview redirect middleware
-  return supabaseMiddleware(req)
+  const host = req.nextUrl.hostname
+
+  // Redirect ALL netlify preview/branch URLs to production
+  if (
+    host.endsWith(".netlify.app") &&
+    host !== "quasimdottech.netlify.app"
+  ) {
+    const url = req.nextUrl.clone()
+    url.hostname = "quasimdottech.netlify.app"
+    return NextResponse.redirect(url)
+  }
+
+  return NextResponse.next()
 }
 
 // Configure which paths the middleware runs on

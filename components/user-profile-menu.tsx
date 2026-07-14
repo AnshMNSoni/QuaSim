@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { createClient } from "@/lib/supabase/client"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,37 +13,46 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { User, LogOut, Settings } from "lucide-react"
-import type { User as SupabaseUser } from "@supabase/supabase-js"
+
+interface UserProfile {
+  id: string
+  email: string
+  user_metadata: {
+    avatar_url?: string
+    full_name?: string
+  }
+}
 
 export function UserProfileMenu() {
-  const [user, setUser] = useState<SupabaseUser | null>(null)
+  const [user, setUser] = useState<UserProfile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
-  const supabase = createClient()
 
   useEffect(() => {
     const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      setUser(user)
-      setIsLoading(false)
+      try {
+        const res = await fetch("/api/auth/me")
+        if (res.ok) {
+          const data = await res.json()
+          setUser(data.user)
+        }
+      } catch (err) {
+        console.error("Failed to fetch user session:", err)
+      } finally {
+        setIsLoading(false)
+      }
     }
 
     getUser()
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-    })
-
-    return () => subscription.unsubscribe()
-  }, [supabase.auth])
+  }, [])
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
-    window.location.href = "/auth/login"
+    try {
+      await fetch("/api/auth/logout", { method: "POST" })
+      window.location.href = "/auth/login"
+    } catch (err) {
+      console.error("Logout failed:", err)
+    }
   }
 
   if (isLoading) {
