@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Github } from "lucide-react"
 import Link from "next/link"
+import RippleBackground from "@/components/ripple-background"
 
 export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -17,8 +18,12 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
-      <Card className="w-full max-w-md border-gray-200 dark:border-gray-800 shadow-xl">
+    <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden">
+      <RippleBackground />
+      <Card 
+        className="w-full max-w-md bg-neutral-900/70 border-neutral-800 shadow-2xl backdrop-blur-md text-white transition-all duration-300"
+        onClick={(e) => e.stopPropagation()}
+      >
         <CardHeader className="space-y-1 text-center">
           <CardTitle
             className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600"
@@ -26,7 +31,7 @@ export default function SignUpPage() {
           >
             QuaSim
           </CardTitle>
-          <CardDescription className="text-gray-500 dark:text-gray-400">
+          <CardDescription className="text-neutral-400">
             Create an account to access the simulator
           </CardDescription>
         </CardHeader>
@@ -37,10 +42,10 @@ export default function SignUpPage() {
               variant="outline"
               onClick={() => handleOAuthLogin("google")}
               disabled={isLoading}
-              className="w-full flex items-center justify-center py-6 text-base"
+              className="w-full flex items-center justify-center py-6 text-base bg-neutral-950/50 border-neutral-800 text-white hover:bg-neutral-900 hover:text-white"
             >
               <svg
-                className="mr-3 h-5 w-5"
+                className="mr-3 h-5 w-5 text-white"
                 aria-hidden="true"
                 focusable="false"
                 data-prefix="fab"
@@ -60,9 +65,9 @@ export default function SignUpPage() {
               variant="outline"
               onClick={() => handleOAuthLogin("github")}
               disabled={isLoading}
-              className="w-full flex items-center justify-center py-6 text-base"
+              className="w-full flex items-center justify-center py-6 text-base bg-neutral-950/50 border-neutral-800 text-white hover:bg-neutral-900 hover:text-white"
             >
-              <Github className="mr-3 h-5 w-5" />
+              <Github className="mr-3 h-5 w-5 text-white" />
               Sign up with GitHub
             </Button>
           </div>
