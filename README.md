@@ -31,7 +31,7 @@ Welcome to **QuaSim** – a powerful, easy-to-use **Quantum Circuit Simulator** 
 
 ## 🌐 Try It Live
 
-#### 👉 [Click here to use QuaSim](https://quasimdottech.netlify.app/)
+#### [Click here to use QuaSim](https://quasimdottech.netlify.app/)
 
 ---
 
@@ -72,7 +72,7 @@ npm start        # or python app.py for Flask apps
 - Click "Run Simulation" to view the result.
 - Analyze outputs and adjust as needed.
 
-## 🙌 Acknowledgements
+## Acknowledgements
 - Inspired by the growing needs of the **National Quantum Mission (NQM)**
 - Thanks to the quantum community for continued motivation and support.
 
