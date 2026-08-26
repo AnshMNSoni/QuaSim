@@ -1,4 +1,4 @@
-# QuaSim – Quantum Circuit Simulator (Made in India)
+# QuaSim – Quantum Circuit Simulator
 
 [![TypeScript](https://img.shields.io/badge/Language-TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Next.js](https://img.shields.io/badge/Tech-Next.js-black?style=for-the-badge&logo=nextdotjs)](https://nextjs.org/) [![Tailwind CSS](https://img.shields.io/badge/Styling-Tailwind%20CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/) [![Quantum Computing](https://img.shields.io/badge/Domain-Quantum%20Computing-purple?style=for-the-badge)](https://github.com/AnshMNSoni/QuaSim) [![Live Preview](https://img.shields.io/badge/Live-Preview-success?style=for-the-badge&logo=netlify)](https://quasimdottech.netlify.app/)
 
